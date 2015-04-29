@@ -65,6 +65,20 @@ class DogstatsdOutputTest < Test::Unit::TestCase
     ])
   end
 
+  def test_key_prefix
+    d = create_driver(<<-EOC)
+#{default_config}
+key_prefix prefix.
+    EOC
+
+    d.emit({'type' => 'increment', 'key' => 'key'}, Time.now.to_i)
+    d.run
+
+    assert_equal(d.instance.statsd.messages, [
+      [:increment, 'prefix.key', {}],
+    ])
+  end
+
   def test_metric_type
     d = create_driver(<<-EOC)
 #{default_config}
