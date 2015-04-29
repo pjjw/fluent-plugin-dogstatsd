@@ -11,7 +11,7 @@ class DummyStatsd
     yield(self)
   end
 
-  %i!increment decrement count gauge histogram timing set event!.each do |name|
+  %w(increment decrement count gauge histogram timing set event).map(&:to_sym).each do |name|
     define_method(name) do |*args|
       @messages << [name, args].flatten
     end
@@ -62,20 +62,6 @@ class DogstatsdOutputTest < Test::Unit::TestCase
       [:timing, 'hello.world', 10, {}],
       [:set, 'hello.world', 10, {}],
       [:event, 'Deploy', 'Revision', {}],
-    ])
-  end
-
-  def test_flat_tag
-    d = create_driver(<<-EOC)
-#{default_config}
-flat_tag true
-    EOC
-
-    d.emit({'type' => 'increment', 'key' => 'hello.world', 'tagKey' => 'tagValue'}, Time.now.to_i)
-    d.run
-
-    assert_equal(d.instance.statsd.messages, [
-      [:increment, 'hello.world', {tags: ["tagKey:tagValue"]}],
     ])
   end
 

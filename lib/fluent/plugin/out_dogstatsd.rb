@@ -5,7 +5,6 @@ module Fluent
     config_param :host, :string, :default => nil
     config_param :port, :integer, :default => nil
     config_param :use_tag_as_key, :bool, :default => false
-    config_param :flat_tags, :bool, :default => false
     config_param :metric_type, :string, :default => nil
     config_param :value_key, :string, :default => nil
 
@@ -52,11 +51,7 @@ module Fluent
 
           options = {}
 
-          tags = if @flat_tags
-                   record
-                 else
-                   record['tags']
-                 end
+          tags = record['tags']
 
           title = record.delete('title')
           text  = record.delete('text')
